@@ -1,0 +1,22 @@
+K1 Soccer Skills demo
+Copyright (c) 2026 Sebastian Brooker. All rights reserved.
+
+1. Policies. The neural network policies served with this demo (their weights, in any form, encrypted
+   or not, and anything derived from them) are proprietary. You may run them only through this demo,
+   in your web browser, for your own viewing and play. You may not download, extract, decrypt, copy,
+   redistribute, modify, fine-tune, benchmark or use them in any other software, simulation or robot,
+   or use them to train or distil other models, without prior written permission.
+
+   The walk policy was trained by a third party and remains theirs; the same restrictions apply to it.
+
+2. Code. The demo's source code is proprietary and is not licensed for reuse, copying or
+   redistribution, except as needed for your browser to run the demo.
+
+3. Robot model. The Booster K1 model and meshes under assets/model/ are by Booster Robotics and are
+   distributed under their BSD 3-Clause licence (assets/model/LICENSE.booster_assets), which this
+   notice does not change.
+
+4. Third-party libraries. MuJoCo (Apache 2.0) and three.js (MIT) are loaded from their public CDN
+   builds under their own licences.
+
+THE DEMO IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.

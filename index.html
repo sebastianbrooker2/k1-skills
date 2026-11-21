@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>K1 Soccer Skills</title>
+  <meta name="description" content="Play a Booster K1 humanoid with learned walk, receive, dribble and kick policies, simulated in your browser with MuJoCo.">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0e1116">
+  <link rel="manifest" href="app.webmanifest">
+  <link rel="stylesheet" href="style.5aaac3744f.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+        "@mujoco/mujoco": "https://cdn.jsdelivr.net/npm/@mujoco/mujoco@3.10.0/mujoco.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="view"></div>
+
+  <div id="loading">
+    <div class="card">
+      <h1>K1 Soccer Skills</h1>
+      <p>A Booster K1 humanoid playing with learned walk, receive, first-touch, dribble, kick and air-shot policies. Physics
+        and policies run in your browser; the first load downloads about 30 MB.</p>
+      <div class="bar"><div id="progress"></div></div>
+      <p id="loading-status">Starting…</p>
+    </div>
+  </div>
+
+  <!-- Phones and tablets: played sideways and full screen. -->
+  <div id="rotate">
+    <div class="card">
+      <div class="phone"></div>
+      <h2>Turn your phone sideways</h2>
+      <p>K1 Soccer Skills plays in landscape.</p>
+    </div>
+  </div>
+  <!-- How to play, over the first frame: any key or a click starts (on a phone, the button). -->
+  <div id="start" hidden>
+    <div class="card">
+      <h2>How to play</h2>
+      <div class="howto keyboard">
+        <div class="caps"><span class="wasd"><kbd>W</kbd><br><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></div>
+        <div><b>Move</b>, and dribble once you have the ball</div>
+        <div class="caps"><kbd class="wide">Space</kbd> <kbd>C</kbd></div>
+        <div><b>Shoot</b>: hold to charge, let go to kick. <kbd>C</kbd> chips it in the air</div>
+        <div class="caps"><kbd>Q</kbd></div>
+        <div class="q-free"><b>Pass it back</b>: the ball is rolled back to you</div>
+        <div class="q-rondo" hidden><b>Pass</b> to the open teammate</div>
+        <div class="extras"><span><kbd class="wide">Shift</kbd> run faster</span><span><kbd>E</kbd> ball to your feet</span><span><kbd>R</kbd> reset</span></div>
+      </div>
+      <div class="howto touch">
+        <div class="caps"><span class="pad stick"></span></div>
+        <div><b>Move</b> with the stick, and dribble once you have the ball</div>
+        <div class="caps"><span class="pad shoot">Shoot</span> <span class="pad air">Air</span></div>
+        <div><b>Shoot</b>: hold to charge, let go to kick. Air chips it</div>
+        <div class="caps"><span class="pad">Pass</span></div>
+        <div class="q-free"><b>Pass it back</b>: the ball is rolled back to you</div>
+        <div class="q-rondo" hidden><b>Pass</b> to the open teammate</div>
+        <div class="extras"><span>Stick all the way: run faster</span><span><span class="pad">Ball</span> ball to your feet</span><span><span class="pad">Stand up</span> reset</span></div>
+      </div>
+      <button id="start-button">Play</button>
+      <p id="start-tip">or press <kbd>Q</kbd>: the ball is passed to you</p>
+    </div>
+  </div>
+
+  <div id="hud" hidden>
+    <div id="status"><span id="skill">—</span> <span id="detail"></span><div id="note"></div></div>
+    <div id="keys">
+      <div data-drill="rondo" hidden>
+        <div><b>Rondo</b> pass it round the triangle, keep it from the robot in the middle. The keys play whoever the ball is going to</div>
+        <div><kbd>Q</kbd> or <kbd>Space</kbd> pass (aimed at the open teammate; tap = right power, hold <kbd>Space</kbd> = harder) · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> re-aim</div>
+        <div>As it comes: <kbd>Q</kbd> pass it on first time · <kbd>Space</kbd> hit it first time · hold a direction for a first touch</div>
+        <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> dribble / walk · <kbd>X</kbd> let go · <kbd>R</kbd> new round · <kbd>P</kbd> pause · <kbd>V</kbd> camera</div>
+      </div>
+      <div data-drill="rondo_defend" hidden>
+        <div><b>Rondo: defend</b> you're the robot in the middle. The three pass it round and dribble away from you: touch the ball to win it</div>
+        <div><kbd>W</kbd> walk · <kbd>Shift</kbd> faster (2 m/s) · <kbd>S</kbd> back · <kbd>A</kbd><kbd>D</kbd> turn</div>
+        <div><kbd>R</kbd> new round · <kbd>P</kbd> pause · <kbd>V</kbd> camera</div>
+      </div>
+      <div data-drill="free">
+      <div><b>No ball</b> <kbd>W</kbd><kbd>S</kbd> walk · <kbd>A</kbd><kbd>D</kbd> turn</div>
+      <div><b>With the ball</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> dribble · <kbd>X</kbd> let go</div>
+      <div><kbd>Space</kbd> hold to charge a shot · <kbd>C</kbd> an air shot · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> aim, release to kick</div>
+      <div><kbd>Q</kbd> call for a pass. As it comes: hold a direction for a first touch, <kbd>Q</kbd> to pass it first time, <kbd>Space</kbd> to shoot it first time</div>
+      <div><kbd>E</kbd> ball at feet · <kbd>Shift</kbd> faster · <kbd>R</kbd> stand up · <kbd>P</kbd> pause · <kbd>V</kbd> camera</div>
+      </div>
+    </div>
+    <button id="menu" aria-label="Settings">☰</button>
+    <div id="panel">
+      <div id="drills">
+        <div class="label">Training</div>
+        <div class="row">
+          <button data-drill="free">Free play</button><button data-drill="rondo">Rondo</button>
+        </div>
+        <div class="row">
+          <button data-drill="rondo_defend">Rondo: defend</button>
+        </div>
+      </div>
+      <div class="label">Camera</div>
+      <div class="row" id="cameras">
+        <button data-camera="free">Free</button><button data-camera="follow">Follow</button><button data-camera="behind">Behind</button>
+      </div>
+      <div class="label">Simulation</div>
+      <div class="row">
+        <button id="pause">Pause</button><button id="reset">Reset</button>
+      </div>
+      <div class="row" id="speeds">
+        <button data-speed="0.25">¼×</button><button data-speed="0.5">½×</button><button data-speed="1">1×</button>
+      </div>
+      <div class="stat"><span>Sim time</span><span id="time">0.0 s</span></div>
+      <div class="stat"><span>Speed</span><span id="rtf">—</span></div>
+    </div>
+    <div id="scoreboard" hidden>
+      <div id="counter"><span id="count">0</span><span id="count-label">passes in a row</span></div>
+      <div id="count-best"></div>
+      <ol id="board"></ol>
+      <div id="board-note"></div>
+    </div>
+    <div id="name-entry" hidden>
+      <form class="card" id="name-form">
+        <h2 id="name-title">New high score!</h2>
+        <p id="name-text">Put your name on the leaderboard.</p>
+        <input id="name-input" maxlength="16" autocomplete="nickname" placeholder="Your name" enterkeyhint="done">
+        <div class="row"><button type="submit" id="name-save">Save</button><button type="button" id="name-skip">Skip</button></div>
+        <p id="name-error"></p>
+      </form>
+    </div>
+    <div id="goal">GOAL!</div>
+    <div id="legal">© 2026 Sebastian Brooker · policies may not be downloaded or reused · <a href="LICENSE" target="_blank">licence</a></div>
+  </div>
+
+  <script type="module" src="app.8a46af8830.js"></script>
+</body>
+</html>
